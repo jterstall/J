@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">JeroenTerstall-pset3</string>
+    <string name="app_name">Movie Watch List \n Made by: Jeroen Terstall</string>
+    <string name="buttonText">Search</string>
 </resources>

@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/none"
+          android:title="" />
+    <item
+        android:id="@+id/search_item"
+        android:icon="@drawable/ic_search_white_24dp"
+        android:title="Search"
+        />
+    <item
+        android:id="@+id/home_item"
+        android:icon="@drawable/ic_home_white_24dp"
+        android:title="Home"
+        />
+    <item
+        android:id="@+id/watchlist_item"
+        android:icon="@drawable/ic_visibility_white_24dp"
+        android:title="Watch List"
+        />
+</menu>
