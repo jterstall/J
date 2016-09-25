@@ -9,10 +9,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+// This class handles the retrieving of an image url and converting to a bitmap which replaces the source
+// of the poster image ImageView
 public class ShowPosterTask extends AsyncTask<String, Void, Bitmap>
 {
     ImageView imageView;
 
+    // Constructor
     public ShowPosterTask(ImageView imageView)
     {
         this.imageView = imageView;
@@ -20,10 +23,12 @@ public class ShowPosterTask extends AsyncTask<String, Void, Bitmap>
 
     protected Bitmap doInBackground(String... params)
     {
+        // Retrieve image url
         String image_url = params[0];
         URL url;
         try
         {
+            // Retrieve Bitmap from url and return
             url = new URL(image_url);
             Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
             return bmp;
@@ -41,6 +46,7 @@ public class ShowPosterTask extends AsyncTask<String, Void, Bitmap>
 
     protected void onPostExecute(Bitmap result)
     {
+        // Set the ImageView with the bitmap created in doInBackground
         imageView.setImageBitmap(result);
     }
 }

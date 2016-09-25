@@ -2,7 +2,6 @@ package terstall.jeroenterstall_pset3;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -10,10 +9,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.roughike.bottombar.BottomBar;
-import com.roughike.bottombar.BottomBarTab;
-import com.roughike.bottombar.OnTabSelectedListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +34,7 @@ public class ShowMovieInformation extends AppCompatActivity
     String metascore;
     String poster;
 
+    // Shared preferences and corresponding editors
     SharedPreferences sp;
     SharedPreferences sp_posters;
     SharedPreferences.Editor editor;
@@ -49,39 +45,21 @@ public class ShowMovieInformation extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_movie_information);
+        // Retrieve movie information from intent
         Intent intent = this.getIntent();
         String movieInformation = intent.getStringExtra(MOVIE_INFORMATION);
+        // Display that information
         displayMovieInformation(movieInformation);
+        // set an icon based on if the movie is watchlisted
         setWatchListIcon(movieInformation);
     }
 
-    private void setWatchListIcon(String movieInformation)
-    {
-        try
-        {
-            JSONObject jsonObject = new JSONObject(movieInformation);
-            title = jsonObject.getString(RetrieveMovieInformationTask.JSON_TITLE);
-        }
-        catch (JSONException e)
-        {
-            e.printStackTrace();
-        }
-        ImageView watchlist_icon = (ImageView) findViewById(R.id.watchlist_icon);
-        sp = getApplicationContext().getSharedPreferences(MOVIES_PREF, 0);
-        if(sp.contains(title))
-        {
-            watchlist_icon.setImageResource(R.drawable.ic_check_box_white_24dp);
-        }
-        else
-        {
-            watchlist_icon.setImageResource(R.drawable.ic_add_box_white_24dp);
-        }
-    }
-
+    // This functions sets all views according to movie information from JSON
     private void displayMovieInformation(String movieInformation)
     {
         try
         {
+            // Create JSON object from string
             JSONObject jsonObject = new JSONObject(movieInformation);
 
             // Retrieve movie information from json
@@ -108,6 +86,7 @@ public class ShowMovieInformation extends AppCompatActivity
             {
                 new ShowPosterTask((ImageView) findViewById(R.id.posterImage)).execute(poster);
             }
+
             // Retrieve TextView ids
             TextView movieTitle = (TextView) findViewById(R.id.movie_title);
             TextView moviePlot = (TextView) findViewById(R.id.movie_plot);
@@ -119,16 +98,14 @@ public class ShowMovieInformation extends AppCompatActivity
             TextView movieActors = (TextView) findViewById(R.id.movie_actors);
             TextView movieGenre_Runtime = (TextView) findViewById(R.id.movie_genre_runtime);
 
-            // Set TextViews to movie information
+            // Set TextViews to corresponding movie information
             movieDirector.setText(Html.fromHtml(director));
             rating_imdb.setText(Html.fromHtml(imdbRating));
             moviePlot.setText(Html.fromHtml(plot));
-
             movieWriter.setText(writer);
             movieActors.setText(actors);
             movieTitle.setText(title + " " + year);
             movieGenre_Runtime.setText(genre + ", " + runtime);
-
             rating_metascore.setText(metascore);
             rating_rottentomatoes.setText(tomatoesRating);
         }
@@ -138,14 +115,19 @@ public class ShowMovieInformation extends AppCompatActivity
         }
     }
 
+    // Function that gets called if a movie is added to watchlist
     public void addToWatchList(View v)
     {
+        // Retrieve watchlist icon view
         ImageView watchlist_icon = (ImageView) findViewById(R.id.watchlist_icon);
+
+        // Retrieve movie information from intent
         Intent intent = getIntent();
         String movieInformation = intent.getStringExtra(MOVIE_INFORMATION);
 
         try
         {
+            // Retrieve title and poster url from JSON
             JSONObject jsonObject = new JSONObject(movieInformation);
             title = jsonObject.getString(RetrieveMovieInformationTask.JSON_TITLE);
             poster = jsonObject.getString(RetrieveMovieInformationTask.JSON_POSTER);
@@ -155,30 +137,69 @@ public class ShowMovieInformation extends AppCompatActivity
             e.printStackTrace();
         }
 
+        // Retrieve sharedpreferences and correponding editors
         sp = getApplicationContext().getSharedPreferences(MOVIES_PREF, 0);
         sp_posters = getApplicationContext().getSharedPreferences(MOVIES_PREF_POSTER, 0);
         editor = sp.edit();
         editor_posters = sp_posters.edit();
+
+        // If the movie is already watchlisted, remove the movie from watchlist
         if(sp.contains(title))
         {
+            // Remove from both editors
             editor.remove(title);
             editor_posters.remove(title);
             editor.commit();
             editor_posters.commit();
+            // Change icon
             watchlist_icon.setImageResource(R.drawable.ic_add_box_white_24dp);
+            // Tell the user what happened
             Toast toast = Toast.makeText(getApplicationContext(), "Removed from Watch List", Toast.LENGTH_SHORT);
             toast.show();
         }
+        // If the movie is not watchlisted, add the movie to watchlist
         else
         {
+            // Add to editors
             editor.putString(title, title);
             editor_posters.putString(title, poster);
             editor.commit();
             editor_posters.commit();
+            // Change icon
             watchlist_icon.setImageResource(R.drawable.ic_check_box_white_24dp);
+            // Tell the user what happened
             Toast toast = Toast.makeText(getApplicationContext(), "Added to Watch List!", Toast.LENGTH_SHORT);
             toast.show();
         }
 
+    }
+
+    // Function to set the icon under the movie poster, to remove/add movie to watchlist
+    private void setWatchListIcon(String movieInformation)
+    {
+        try
+        {
+            // Retrieve title from JSON
+            JSONObject jsonObject = new JSONObject(movieInformation);
+            title = jsonObject.getString(RetrieveMovieInformationTask.JSON_TITLE);
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+        // Get ImageView from watchlist icon
+        ImageView watchlist_icon = (ImageView) findViewById(R.id.watchlist_icon);
+        // Retrieve sharedpreferences
+        sp = getApplicationContext().getSharedPreferences(MOVIES_PREF, 0);
+        // If movie title is in shared preferences, use the checkbox
+        if(sp.contains(title))
+        {
+            watchlist_icon.setImageResource(R.drawable.ic_check_box_white_24dp);
+        }
+        // Otherwise use the add box
+        else
+        {
+            watchlist_icon.setImageResource(R.drawable.ic_add_box_white_24dp);
+        }
     }
 }

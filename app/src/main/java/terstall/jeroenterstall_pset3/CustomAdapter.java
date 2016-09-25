@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+// This class overwrites the basic adapter for a listview with images, text and a button
 
 public class CustomAdapter extends BaseAdapter implements ListAdapter
 {
@@ -20,6 +21,7 @@ public class CustomAdapter extends BaseAdapter implements ListAdapter
     private ArrayList<String> poster_urls;
     Context context;
 
+    // Constructor
     public CustomAdapter(ArrayList<String> watchlist, ArrayList<String> poster_urls, Context context)
     {
         this.watchlist = watchlist;
@@ -27,18 +29,21 @@ public class CustomAdapter extends BaseAdapter implements ListAdapter
         this.context = context;
     }
 
+    // Stays the same function
     @Override
     public int getCount()
     {
         return watchlist.size();
     }
 
+    // Stays the same function
     @Override
     public Object getItem(int position)
     {
         return watchlist.get(position);
     }
 
+    // Stays the same function
     @Override
     public long getItemId(int position)
     {
@@ -48,6 +53,7 @@ public class CustomAdapter extends BaseAdapter implements ListAdapter
     @Override
     public View getView(final int position, View convertView, ViewGroup parent)
     {
+        // Create a listview with custom list items made in xml
         View view = convertView;
         if(view == null)
         {
@@ -55,11 +61,11 @@ public class CustomAdapter extends BaseAdapter implements ListAdapter
             view = inflater.inflate(R.layout.list_item_1, null);
         }
 
+        // Retrieve TextView object and change the text to the movie title
         TextView listItem = (TextView) view.findViewById(R.id.movie_name);
         listItem.setText(watchlist.get(position).toString());
 
-        ImageView deleteButton = (ImageView) view.findViewById(R.id.delete_button);
-
+        // Retrieve ImageView for the poster image and set it with the correct image
         ImageView posterImage = (ImageView) view.findViewById(R.id.poster_image);
         String poster_url = poster_urls.get(position).toString();
         if(poster_url.equals("N/A"))
@@ -71,17 +77,24 @@ public class CustomAdapter extends BaseAdapter implements ListAdapter
             new ShowPosterTask(posterImage).execute(poster_url);
         }
 
+        // Retrieve delete button image view
+        ImageView deleteButton = (ImageView) view.findViewById(R.id.delete_button);
+        // If button is clicked, ask the user for confirmation and call the removeItem function in
+        // WatchListActivity class
         deleteButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
+                // Retrieve activity from context
                 final WatchListActivity activity = (WatchListActivity) context;
+                // Create the confirmation message
                 AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                 builder.setMessage("Do you really want to remove this movie from your Watch List?");
                 builder.setTitle("Confirmation");
                 builder.setPositiveButton("DELETE", new DialogInterface.OnClickListener()
                 {
+                    // If the user decides to delete call removeItem from WatchListActivity class
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
@@ -90,6 +103,7 @@ public class CustomAdapter extends BaseAdapter implements ListAdapter
                 });
                 builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener()
                 {
+                    // Otherwise do nothing
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
